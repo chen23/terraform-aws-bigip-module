@@ -23,13 +23,13 @@ resource random_string password {
 #
 # Create Secret Store and Store BIG-IP Password
 #
-resource "aws_secretsmanager_secret" "bigip" {
-  name = format("%s-bigip-secret-%s", var.prefix, random_id.id.hex)
-}
-resource "aws_secretsmanager_secret_version" "bigip-pwd" {
-  secret_id     = aws_secretsmanager_secret.bigip.id
-  secret_string = random_string.password.result
-}
+# resource "aws_secretsmanager_secret" "bigip" {
+#   name = format("%s-bigip-secret-%s", var.prefix, random_id.id.hex)
+# }
+# resource "aws_secretsmanager_secret_version" "bigip-pwd" {
+#   secret_id     = aws_secretsmanager_secret.bigip.id
+#   secret_string = random_string.password.result
+# }
 
 #
 # Create the VPC
@@ -178,13 +178,14 @@ module bigip {
   count                       = var.instance_count
   prefix                      = format("%s-3nic", var.prefix)
   ec2_key_name                = aws_key_pair.generated_key.key_name
-  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+#  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
   mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true, "private_ip_primary" = ""}]
   mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
   external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
   internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
   external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
   internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false, "private_ip_primary" = ""}]
+  f5_ami_search_name          = var.f5_ami_search_name
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 
