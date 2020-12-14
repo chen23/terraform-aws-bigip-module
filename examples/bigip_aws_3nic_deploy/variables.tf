@@ -31,4 +31,4 @@ variable instance_count {
   type        = number
   default     = 1
 }
-f5_ami_search_name {}
+variable f5_ami_search_name {}
